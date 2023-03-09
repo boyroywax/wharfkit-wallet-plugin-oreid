@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "downlevelIteration": true,
+        "esModuleInterop": true,
+        "experimentalDecorators": true,
+        "importHelpers": true,
+        "lib": ["esnext", "dom"],
+        "module": "esnext",
+        "moduleResolution": "node",
+        "noImplicitAny": false,
+        "sourceMap": true,
+        "strict": true,
+        "target": "es2020",
+        "useUnknownInCatchVariables": false,
+        "resolveJsonModule": true,
+        "baseUrl": ".",
+        "paths": {
+            "$lib": ["src/lib"],
+            "$ui": ["src/ui/*"]
+        }
+    },
+    "include": ["src/*", "src/lib/*", "src/lib/**/*"]
+}

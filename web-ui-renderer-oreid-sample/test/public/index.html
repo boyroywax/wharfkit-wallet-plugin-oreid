@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html data-color-mode="dark" data-dark-theme="dark_dimmed" lang="en">
+    <head>
+        <title>@wharfkit/web-ui-renderer</title>
+        <script src="./bundle.js"></script>
+        <script>
+            const {
+                abiEncode,
+                Asset,
+                Bytes,
+                PackedTransaction,
+                Serializer,
+                SessionKit,
+                Session,
+                SignedTransaction,
+                Transaction,
+            } = WebUIRenderer
+
+            const autoCorrect = new WebUIRenderer.TransactPluginAutoCorrect()
+            const cosigner = new WebUIRenderer.TransactPluginCosigner({
+                actor: 'wharfkitnoop',
+                permission: 'cosign',
+                privateKey: '5JfFWg1CWsNTeXTWMyfChXXbyD31TCTknSVGwXDSpT6bPxKYLMM',
+            })
+            const explorerLink = new WebUIRenderer.TransactPluginExplorerLink()
+            const mockTransactPlugin = new WebUIRenderer.TransactPluginMock({
+                prompt: true,
+                promptOptions: {
+                    continueOnAccept: true,
+                    continueOnCancel: false,
+                    continueOnDecline: true,
+                    timeout: 5000,
+                },
+            })
+
+            const resourceProvider = new WebUIRenderer.TransactPluginResourceProvider()
+
+            const ui = new WebUIRenderer()
+
+            const sessionKit = new SessionKit({
+                appName: 'demo-app',
+                // Various chain configurations, uncomment one or more to test
+                chains: [
+                    {
+                        id: '73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d',
+                        url: 'https://jungle4.greymass.com',
+                        explorer: {
+                            prefix: 'https://jungle4.eosq.eosnation.io/tx/',
+                            suffix: '',
+                        },
+                    },
+                    {
+                        id: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
+                        url: 'https://eos.greymass.com',
+                        explorer: {
+                            prefix: 'https://bloks.io/transaction/',
+                            suffix: '',
+                        },
+                    },
+                    {
+                        id: '4667b205c6838ef70ff7988f6e8257e8be0e1284a2f59699054a018f743b1d11',
+                        url: 'https://telos.greymass.com',
+                        explorer: {
+                            prefix: 'https://explorer.telos.net/transaction/',
+                            suffix: '',
+                        },
+                    },
+                    {
+                        id: '1eaa0824707c8c16bd25145493bf062aecddfeb56c736f6ba6397f3195f33c9f',
+                        url: 'https://telostestnet.greymass.com',
+                        explorer: {
+                            prefix: 'https://explorer.telos.net/transaction/',
+                            suffix: '',
+                        },
+                    },
+                    {
+                        id: '8fc6dce7942189f842170de953932b1f66693ad3788f766e777b6f9d22335c02',
+                        url: 'https://api.uxnetwork.io',
+                        explorer: {
+                            prefix: 'https://explorer.uxnetwork.io/tx/',
+                            suffix: '',
+                        },
+                    },
+                    {
+                        id: '1064487b3cd1a897ce03ae5b6a865651747e2e152090f99c1d19d44e01aea5a4',
+                        url: 'https://wax.greymass.com',
+                        explorer: {
+                            prefix: 'https://waxblock.io/transaction/',
+                            suffix: '',
+                        },
+                    },
+                    {
+                        id: 'f16b1833c747c43682f4386fca9cbb327929334a762755ebec17f6f23c9b8a12',
+                        url: 'https://waxtestnet.greymass.com',
+                        explorer: {
+                            prefix: 'https://wax-test.bloks.io/transaction/',
+                            suffix: '',
+                        },
+                    },
+                ],
+                ui,
+                transactPlugins: [],
+                // Various wallet configurations, uncomment one or more to test
+                walletPlugins: [
+                    new WebUIRenderer.WalletPluginAnchor(),
+                    new WebUIRenderer.WalletPluginCleos(),
+                    new WebUIRenderer.WalletPluginCloudWallet(),
+                    new WebUIRenderer.WalletPluginMock(),
+                    new WebUIRenderer.WalletPluginPrivateKey(
+                        '5Jtoxgny5tT7NiNFp1MLogviuPJ9NniWjnU4wKzaX4t7pL4kJ8s'
+                    ),
+                    new WebUIRenderer.WalletPluginOreId()
+                ],
+            })
+
+            let session
+            let account
+
+            // tries to restore session, called when document is loaded
+            async function restoreSession() {
+                session = await sessionKit.restore().catch((e) => {
+                    console.log('error caught in restore', e)
+                })
+                updateSessions()
+                // If the session was defined, set the UI to logged in
+                if (session) {
+                    didLogin()
+                    refreshAccount()
+                }
+
+                const queryString = window.location.search;
+                const urlParams = new URLSearchParams(queryString);
+
+                // Automatically trigger a login if ?login exists on the URL
+                if (urlParams.get('login') !== null) {
+                    setTimeout(() => {
+                        console.log('triggering login automatically...')
+                        login()
+                    }, 100)
+                }
+
+                // Automatically trigger a login if ?login exists on the URL
+                if (urlParams.get('transact') !== null) {
+                    setTimeout(() => {
+                        console.log('triggering transfer automatically...')
+                        transfer({ transactPlugins: [mockTransactPlugin]})
+                    }, 100)
+                }
+            }
+
+            async function updateSessions() {
+                const sessions = await sessionKit.getSessions()
+                sessions.sort((a, b) => (a.actor > b.actor ? 1 : -1))
+                const nav = document.getElementById('sessions')
+                nav.innerHTML = ''
+                sessions.forEach((s) => {
+                    const navItem = document.createElement('a')
+                    navItem.classList = 'SideNav-subItem'
+                    navItem.href = `#${s.actor}-${s.permission}-${s.chain}`
+                    navItem.textContent = `${s.actor} (${s.permission})`
+                    if (
+                        session.actor.equals(s.actor) &&
+                        session.permission.equals(s.permission) &&
+                        session.chain.id.equals(s.chain)
+                    ) {
+                        navItem.ariaCurrent = 'page'
+                    }
+                    navItem.onclick = () => {
+                        sessionKit.restore(s).then((result) => {
+                            session = result
+                            didLogin()
+                            refreshAccount()
+                        })
+                    }
+                    nav.appendChild(navItem)
+                })
+            }
+
+            // login and store session if successful
+            function login(options = {}) {
+                sessionKit
+                    .login(options)
+                    .then((result) => {
+                        session = result.session
+                        didLogin()
+                        refreshAccount()
+                    })
+            }
+
+            function refreshAccount() {
+                session.client.v1.chain.get_account(session.actor).then((result) => {
+                    account = result
+                    document.getElementById('account-balance').textContent =
+                        account.core_liquid_balance ? account.core_liquid_balance : '0.0000'
+                    document.getElementById(
+                        'cpu'
+                    ).textContent = `${account.cpu_limit.available} / ${account.cpu_limit.max}`
+                    document.getElementById(
+                        'net'
+                    ).textContent = `${account.net_limit.available} / ${account.net_limit.max}`
+                    document.getElementById(
+                        'ram'
+                    ).textContent = `${account.ram_quota - account.ram_usage} / ${account.ram_quota}`
+                    document.getElementById(
+                        'explorer'
+                    ).href = `https://jungle4.eosq.eosnation.io/account/${session.actor}`
+                })
+            }
+
+            // logout and remove session from storage
+            async function logout() {
+                // Logout the current session
+                await sessionKit.logout(session)
+                const sessions = await sessionKit.getSessions()
+                if (sessions) {
+                    if (!sessions.length) {
+                        document.body.classList.remove('logged-in')
+                        session = undefined
+                        account = undefined
+                    } else {
+                        session = await sessionKit.restore(sessions[0])
+                        account = undefined
+                        didLogin()
+                        refreshAccount()
+                    }
+                } else {
+                    document.body.classList.remove('logged-in')
+                    session = undefined
+                    account = undefined
+                }
+            }
+
+            async function logoutAll() {
+                // Logout all sessions
+                await sessionKit.logout()
+                document.body.classList.remove('logged-in')
+                session = undefined
+                account = undefined
+            }
+
+            // called when session was restored or created
+            function didLogin() {
+                updateSessions()
+                document.getElementById('account-name').textContent = session.actor
+                document.getElementById('account-permission').textContent = session.permission
+                document.getElementById('chain-id').textContent = session.chain.name
+                document.getElementById(
+                    'account-name-logout'
+                ).textContent = `Logout ${session.actor}`
+                document.body.classList.add('logged-in')
+            }
+
+            // transfer tokens using a session
+            function transfer(options = {broadcast: false}) {
+                const action = {
+                    account: 'eosio.token',
+                    name: 'transfer',
+                    authorization: [session.permissionLevel],
+                    data: {
+                        from: session.actor,
+                        to: 'teamgreymass',
+                        // Use minimum value for test transfers
+                        quantity: account.core_liquid_balance
+                            ? Asset.fromUnits(1, account.core_liquid_balance.symbol)
+                            : '0.0001 EOS',
+                        // quantity: Asset.from('1.00000000 WAX'),
+                        memo: 'Yay WharfKit! Thank you <3',
+                    },
+                }
+                const broadcast = document.getElementById("broadcast").checked
+                session.transact({action}, {
+                    ...options,
+                    broadcast
+                }).then((result) => {
+                    const item = document.createElement('div')
+                    item.classList = 'TimelineItem TimelineItem--condensed'
+                    item.innerHTML = `
+                <div class="TimelineItem-badge">
+                    <svg class="octicon octicon-git-commit" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path>
+                    </svg>
+                </div>
+                <div class="TimelineItem-body">
+                    ${new Date().toISOString()} ${
+                        session.actor
+                    } - ${(result.response) ? `<a href="https://jungle4.eosq.eosnation.io/tx/${
+                        result.resolved.transaction.id
+                    }" target="_blank">View on Explorer</a>` : `Not broadcast`}
+                </div>`
+                    document.getElementById('log').prepend(item)
+                }).catch((e) => {
+                    console.log('error caught in transact', e)
+                })
+            }
+
+            setInterval(() => {
+                if (session) {
+                    refreshAccount()
+                }
+            }, 3000)
+        </script>
+        <link href="https://unpkg.com/@primer/css@^20.2.4/dist/primer.css" rel="stylesheet" />
+        <style>
+            body {
+                max-width: 1200px;
+                margin: 10px auto 0;
+                padding: 0 10px;
+            }
+            body .Layout {
+                display: none;
+            }
+            body.logged-in .Layout {
+                display: grid;
+            }
+            .Box, .btn {
+                margin-bottom: 0.25em;
+            }
+        </style>
+    </head>
+    <body onload="restoreSession()">
+        <div class="Subhead">
+            <h2 class="Subhead-heading">Web Renderer Test</h2>
+            <div class="Subhead-description">
+                A suite of testing tools for the
+                <a href="https://github.com/@wharfkit/web-ui-renderer" target="_blank">
+                    @wharfkit/web-ui-renderer
+                </a>.
+            </div>
+          </div>
+        </h2>
+        <nav class="subnav" aria-label="Repository">
+            <a class="subnav-item" aria-current="page" href="#login" onclick="login()">
+                <span>Login</span>
+            </a>
+            <a class="subnav-item" href="#login-test" onclick="login({
+                chain: '73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d',
+                permissionLevel: 'wharfkit1111@test',
+                walletPlugin: 'wallet-plugin-privatekey'
+            })">
+                <span>Test Account (Resources)</span>
+            </a>
+            <a class="subnav-item" href="#login-test" onclick="login({
+                chain: '73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d',
+                permissionLevel: 'wharfkit1112@test',
+                walletPlugin: 'wallet-plugin-privatekey'
+            })">
+                <span>Test Account (No CPU)</span>
+            </a>
+            <a class="subnav-item" href="#login-test" onclick="login({
+                chain: '73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d',
+                permissionLevel: 'wharfkit1115@test',
+                walletPlugin: 'wallet-plugin-privatekey'
+            })">
+                <span>Test Account (No RAM)</span>
+            </a>
+        </nav>
+        <div class="Layout" id="">
+            <div class="Layout-main">
+                <div class="Box">
+                    <div class="Box-header">
+                      Account Data
+                    </div>
+                    <div class="Box-body">
+                        <div class="d-flex">
+                            <div class="p-3 flex-1">
+                                <code><pre id="session-dump"></pre></code>
+                                <p>Actor: <b id="account-name">undefined</b></p>
+                                <p>Permission: <b id="account-permission">undefined</b></p>
+                                <p>Chain: <b id="chain-id">undefined</b></p>
+                                <p>Balance: <b id="account-balance">undefined</b></p>
+                            </div>
+                            <div class="p-3 flex-1">
+                                <p><a id="explorer" target="_blank" href="">Explorer</a></p>
+                                <p>CPU: <b id="cpu">undefined</b></p>
+                                <p>NET: <b id="net">undefined</b></p>
+                                <p>RAM: <b id="ram">undefined</b></p>
+                            </div>
+                        </div>
+                        <button class="btn btn-block btn-primary btn-sm" type="button" onclick="refreshAccount()">
+                            Refresh account
+                        </button>
+                    </div>
+                </div>
+                <div class="Box">
+                    <div class="Box-header">
+                        <h4>Test by sending 0.0001 EOS to teamgreymass</h4>
+                    </div>
+                    <div class="Box-body">
+                        <form>
+                            <div class="form-group">
+                                <div class="form-group-body">
+                                    <div class="form-checkbox">
+                                        <label>
+                                            <input type="checkbox" id="broadcast"/>
+                                            <em class="highlight">Broadcast?</em>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-group-body">
+                                    <div class="form-checkbox">
+                                        <button class="btn btn-block" type="button" onclick="transfer()">
+                                            transact with no plugins
+                                        </button>
+                                        <button class="btn btn-block" type="button" onclick="transfer({transactPlugins: [mockTransactPlugin]})">
+                                            transact with TransactPluginMock
+                                        </button>
+                                        <button
+                                            class="btn btn-block"
+                                            type="button"
+                                            onclick="transfer({transactPlugins: [explorerLink]})"
+                                        >
+                                            transact with TransactPluginExplorerLink
+                                        </button>
+                                        <button
+                                            class="btn btn-block"
+                                            type="button"
+                                            onclick="transfer({transactPlugins: [cosigner]})"
+                                        >
+                                            transact with TransactPluginCosigner
+                                        </button>
+                                        <button
+                                            class="btn btn-block"
+                                            type="button"
+                                            onclick="transfer({transactPlugins: [resourceProvider]})"
+                                        >
+                                            transact with TransactPluginResourceProvider
+                                        </button>
+                                        <button
+                                            class="btn btn-block"
+                                            type="button"
+                                            onclick="transfer({transactPlugins: [autoCorrect]})"
+                                        >
+                                            transact with TransactPluginAutoCorrect
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="Box">
+                    <div class="Box-header">
+                        <h3 class="Box-title">Transaction Log</h3>
+                    </div>
+                    <div class="Box-body" id="log"></div>
+                </div>
+            </div>
+            <div class="Layout-sidebar">
+                <nav class="SideNav border" style="max-width: 360px">
+                    <nav
+                        class="SideNav color-bg-default border-top py-3"
+                        style="padding-left: 24px"
+                    >
+                        <h5 class="color-fg-muted mb-2 border-bottom">Accounts</h5>
+                        <div id="sessions"></div>
+                    </nav>
+                    <a class="SideNav-item" href="#url" onclick="logout()">
+                        <span id="account-name-logout">Logout</span>
+                    </a>
+                    <a class="SideNav-item" href="#url" onclick="logoutAll()">
+                        <span>Logout all</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </body>
+</html>
