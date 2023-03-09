@@ -1,12 +1,12 @@
 {
-    "name": "@wharfkit/wallet-plugin-cloudwallet",
-    "description": "A WalletPlugin for the WAX Cloud Wallet for use within the @wharfkit/session.",
+    "name": "wallet-plugin-oreid",
+    "description": "A WalletPlugin for the OREID Wallet for use within the @wharfkit/session.",
     "version": "0.3.0",
-    "homepage": "https://github.com/wharfkit/wallet-plugin-cloudwallet",
+    "homepage": "https://github.com/wharfkit/wallet-plugin-oreid",
     "license": "BSD-3-Clause",
-    "main": "lib/wallet-plugin-cloudwallet.js",
-    "module": "lib/wallet-plugin-cloudwallet.m.js",
-    "types": "lib/wallet-plugin-cloudwallet.d.ts",
+    "main": "lib/wallet-plugin-oreid.js",
+    "module": "lib/wallet-plugin-oreid.m.js",
+    "types": "lib/wallet-plugin-oreid.d.ts",
     "sideEffects": false,
     "files": [
         "lib/*",
@@ -16,6 +16,8 @@
         "prepare": "make"
     },
     "dependencies": {
+        "oreid-js": "^4.5.0",
+        "oreid-webpopup": "^2.2.5-beta.0",
         "tslib": "^2.1.0"
     },
     "peerDependencies": {

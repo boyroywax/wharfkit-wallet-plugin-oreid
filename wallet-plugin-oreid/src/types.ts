@@ -16,19 +16,19 @@ export class Transfer extends Struct {
     @Struct.field('string') memo!: string
 }
 
-interface WAXCloudWalletResponse {
+interface OreIdResponse {
     verified: boolean
     whitelistedContracts: []
 }
 
-export interface WAXCloudWalletLoginResponse extends WAXCloudWalletResponse {
+export interface OreIdLoginResponse extends OreIdResponse {
     autoLogin: boolean
     isTemp?: boolean
     pubKeys: PublicKeyType[]
     userAccount: NameType
 }
 
-export interface WAXCloudWalletSigningResponse extends WAXCloudWalletResponse {
+export interface OreIdSigningResponse extends OreIdResponse {
     cpu?: number
     estimatorWorking?: boolean
     net?: number
@@ -37,5 +37,5 @@ export interface WAXCloudWalletSigningResponse extends WAXCloudWalletResponse {
     serializedTransaction?: Uint8Array
     signatures: Signature[]
     type: string
-    waxFee?: number
+    Fee?: number
 }

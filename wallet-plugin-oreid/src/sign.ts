@@ -4,7 +4,7 @@ import {
     WalletPluginData,
 } from '@wharfkit/session'
 
-import {WAXCloudWalletSigningResponse} from './types'
+import {OreIdSigningResponse} from './types'
 import {getCurrentTime, isValidEvent, registerCloseListener} from './utils'
 
 export async function allowAutosign(
@@ -45,7 +45,7 @@ export async function autoSign(
     t: (key: string, options?: UserInterfaceTranslateOptions) => string,
     urlString: URL | string,
     request: ResolvedSigningRequest
-): Promise<WAXCloudWalletSigningResponse> {
+): Promise<OreIdSigningResponse> {
     const url = new URL(urlString)
     const controller = new AbortController()
     setTimeout(() => controller.abort(), 5000)
@@ -86,7 +86,7 @@ export async function popupTransact(
     urlString: URL | string,
     request: ResolvedSigningRequest,
     timeout = 300000
-): Promise<WAXCloudWalletSigningResponse> {
+): Promise<OreIdSigningResponse> {
     const url = new URL(urlString)
 
     const popup = await window.open(url, 'WalletPluginCloudWalletPopup', 'height=800,width=600')
@@ -99,7 +99,7 @@ export async function popupTransact(
         )
     }
 
-    return new Promise<WAXCloudWalletSigningResponse>((resolve, reject) => {
+    return new Promise<OreIdSigningResponse>((resolve, reject) => {
         const closeListener = registerCloseListener(t, popup, reject)
         const handleEvent = (event: MessageEvent) => {
             if (!isValidEvent(event, url, popup)) {
