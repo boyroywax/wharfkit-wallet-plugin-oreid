@@ -447,6 +447,7 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         if (options?.loginTimeout) {
             this.loginTimeout = options.loginTimeout
         }
+        this.oreId.init().then(() => { console.log("initialized")})
     }
 
     /**
