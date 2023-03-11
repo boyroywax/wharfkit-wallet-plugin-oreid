@@ -17,6 +17,9 @@ import {
     WalletPluginSignResponse,
 } from '@wharfkit/session'
 
+import { OreId, OreIdOptions } from "oreid-js"
+import { WebPopup } from "oreid-webpopup"
+
 import {autoLogin, popupLogin} from './login'
 import {allowAutosign, autoSign, popupTransact} from './sign'
 import {OreIdLoginResponse, OreIdSigningResponse} from './types'
@@ -28,6 +31,7 @@ export interface WalletPluginOreIdOptions {
     url?: string
     autoUrl?: string
     loginTimeout?: number
+    oreId?: OreId
 }
 
 export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlugin {
@@ -41,6 +45,17 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
      */
     translations = defaultTranslations
 
+    readonly oreIdconfig: OreIdOptions = {
+        appName: "ORE ID Sample App",
+	    appId: 't_515b4ffcfdbf42a986a927481e6baf82',
+	    oreIdUrl: "https://service.oreid.io",
+	    plugins: {
+		    popup: WebPopup()
+        }
+    }
+
+    oreId = new OreId( this.oreIdconfig )
+
     /**
      * The logic configuration for the wallet plugin.
      */
@@ -51,8 +66,8 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         requiresPermissionSelect: false,
         // The blockchains this WalletPlugin supports
         supportedChains: [
-            '1064487b3cd1a897ce03ae5b6a865651747e2e152090f99c1d19d44e01aea5a4', // WAX (Mainnet)
-            // 'f16b1833c747c43682f4386fca9cbb327929334a762755ebec17f6f23c9b8a12', // NYI - WAX (Testnet)
+            // '1064487b3cd1a897ce03ae5b6a865651747e2e152090f99c1d19d44e01aea5a4', // WAX (Mainnet)
+            'f16b1833c747c43682f4386fca9cbb327929334a762755ebec17f6f23c9b8a12', // NYI - WAX (Testnet)
         ],
     }
 
@@ -432,6 +447,10 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         if (options?.loginTimeout) {
             this.loginTimeout = options.loginTimeout
         }
+        if (options?.oreId) {
+            this.oreId = options.oreId
+        }
+        this.oreId.init().then(() => console.log("initialized")).catch()
     }
 
     /**
@@ -441,12 +460,12 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
      * @returns Promise<WalletPluginLoginResponse>
      */
     login(context: LoginContext): Cancelable<WalletPluginLoginResponse> {
-        const promise = this.waxLogin(context)
+        const promise = this.oreLogin(context)
         return cancelable(promise, (canceled) => {
             throw canceled
         })
     }
-    async waxLogin(context: LoginContext): Promise<WalletPluginLoginResponse> {
+    async oreLogin(context: LoginContext): Promise<WalletPluginLoginResponse> {
         if (!context.chain) {
             throw new Error('A chain must be selected to login with.')
         }
@@ -464,7 +483,7 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
             context.ui.status(
                 t('login.popup', {default: 'Login with the Cloud Wallet popup window'})
             )
-            response = await popupLogin(t, `${this.url}/cloud-wallet/login/`)
+            response = await popupLogin(t, `${this.url}/cloud-wallet/login/`, 30000, this.oreId)
         }
 
         // If failed due to no response or no verified response, throw error

@@ -2,6 +2,10 @@ import fs from 'fs'
 import dts from 'rollup-plugin-dts'
 import typescript from '@rollup/plugin-typescript'
 import json from '@rollup/plugin-json'
+import resolve from "@rollup/plugin-node-resolve"
+import nodePolyfills from 'rollup-plugin-polyfill-node'
+import commonjs from '@rollup/plugin-commonjs'
+
 
 import pkg from './package.json'
 
@@ -28,9 +32,14 @@ export default [
             file: pkg.main,
             format: 'cjs',
             sourcemap: true,
-            exports: 'named',
+            exports: "named",
         },
-        plugins: [typescript({target: 'es6'}), json()],
+        plugins: [typescript({target: 'es6'}), json(), resolve({
+            jsnext: true,
+            main: true,
+            browser: true,
+          }), nodePolyfills(),
+        commonjs()],
         external,
     },
     {
@@ -39,9 +48,13 @@ export default [
             banner,
             file: pkg.module,
             format: 'esm',
-            sourcemap: true,
+            sourcemap: true
         },
-        plugins: [typescript({target: 'es2020'}), json()],
+        plugins: [typescript({target: 'es2020'}), json(), resolve({
+            jsnext: true,
+            main: true,
+            browser: true,
+          }), commonjs(), nodePolyfills()],
         external,
     },
     {

@@ -7,6 +7,7 @@ import dts from 'rollup-plugin-dts'
 import json from '@rollup/plugin-json'
 import {terser} from 'rollup-plugin-terser'
 import gzipPlugin from 'rollup-plugin-gzip'
+import nodePolyfills from 'rollup-plugin-polyfill-node'
 
 import pkg from './package.json'
 
@@ -30,6 +31,9 @@ export default [
             format: 'cjs',
             sourcemap: true,
             exports: 'named',
+            globals: {
+                crypto: 'crypto-browserify'
+            }
         },
         plugins: [
             replaceVersion,
@@ -39,12 +43,20 @@ export default [
             }),
             resolve({
                 browser: true,
+                // crypto: true,
+                // http: true,
+                // https: true,
+                // url: true,
+                // stream: true,
+                // assert: true,
+                // tty: true,
                 dedupe: ['svelte'],
             }),
             json(),
             typescript({target: 'es6'}),
             // terser(),
             // gzipPlugin(),
+            nodePolyfills()
         ],
         external: Object.keys({...pkg.dependencies, ...pkg.peerDependencies}),
     },
@@ -69,12 +81,13 @@ export default [
             typescript({target: 'es2020'}),
             // terser(),
             // gzipPlugin(),
+            nodePolyfills()
         ],
         external: Object.keys({...pkg.dependencies, ...pkg.peerDependencies}),
     },
     {
         input: 'src/index.ts',
-        output: {file: pkg.types, format: 'esm'},
+        output: {file: pkg.types, format: 'esm', sourceMap: true},
         plugins: [
             replaceVersion,
             svelte({
@@ -87,6 +100,7 @@ export default [
             }),
             typescript({target: 'es6'}),
             dts(),
+            nodePolyfills()
         ],
     },
 ]

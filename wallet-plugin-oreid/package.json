@@ -16,6 +16,8 @@
         "prepare": "make"
     },
     "dependencies": {
+        "oreid-js": "^4.5.0",
+        "oreid-webpopup": "^2.2.5-beta.0",
         "tslib": "^2.1.0"
     },
     "peerDependencies": {
@@ -23,7 +25,7 @@
     },
     "devDependencies": {
         "@rollup/plugin-alias": "^3.1.4",
-        "@rollup/plugin-commonjs": "^22.0.0",
+        "@rollup/plugin-commonjs": "^24.0.1",
         "@rollup/plugin-json": "^4.1.0",
         "@rollup/plugin-node-resolve": "^14.1.0",
         "@rollup/plugin-replace": "^5.0.1",
@@ -45,14 +47,14 @@
         "nyc": "^15.1.0",
         "prettier": "^2.2.1",
         "rollup": "^2.70.2",
+        "rollup-plugin-commonjs": "^10.1.0",
         "rollup-plugin-dts": "^4.2.1",
+        "rollup-plugin-polyfill-node": "^0.12.0",
         "rollup-plugin-terser": "^7.0.2",
         "ts-node": "^10.9.1",
         "tsconfig-paths": "^4.1.1",
         "typedoc": "^0.23.14",
         "typescript": "^4.1.2",
-        "yarn-deduplicate": "^6.0.1",
-        "oreid-js": "^4.5.0",
-        "oreid-webpopup": "^2.2.5-beta.0"
+        "yarn-deduplicate": "^6.0.1"
     }
 }
