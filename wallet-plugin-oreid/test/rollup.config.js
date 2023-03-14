@@ -11,6 +11,7 @@ import replace from '@rollup/plugin-replace'
 import resolve from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
 import virtual from '@rollup/plugin-virtual'
+import broswerUtils from '@rollup/browser'
 
 const mockData = Object.fromEntries(
     fs
@@ -82,7 +83,8 @@ export default [
                 crypto: 'undefined',
             },
         },
-        external: ['chai', 'mocha', 'crypto', 'util'],
+        // external: ['chai', 'mocha', 'crypto', 'util'],
+        external: ['chai', 'mocha'],
         plugins: [
             virtual({
                 'tests.ts': testFiles.map((f) => `import '${f.slice(0, -3)}'`).join('\n'),

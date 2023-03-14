@@ -38,7 +38,9 @@
         "https": false
     },
     "peerDependencies": {
-        "@wharfkit/session": "^0.3.0"
+        "@wharfkit/session": "^0.3.0",
+        "oreid-js": "^4.5.0",
+        "oreid-webpopup": "^2.2.5-beta.0"
     },
     "devDependencies": {
         "@babel/core": "^7.20.12",
