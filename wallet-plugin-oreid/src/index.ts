@@ -464,7 +464,6 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         // Retrieve translation helper from the UI, passing the app ID
         const t = context.ui.getTranslate(this.id)
 
-        let response_raw: PopupPluginAuthSuccessResults
         let response: OreIdLoginResponse
         // try {
             // Attempt automatic login
