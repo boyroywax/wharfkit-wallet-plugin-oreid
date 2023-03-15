@@ -7,14 +7,14 @@ Clone the Repo
 1. ```git clone <this repo.git>```
 2. ```cd wharfkit-wallet-plugin-oreid```
 
-Link the wallet-plugin to web-ui-renderer-oreid-sample
+#### Link the wallet-plugin to web-ui-renderer-oreid-sample
 3. ```cd wallet-plugin-oreid```
 4. ```make```
 5. ```yarn link```
 6. ```cd ../web-ui-renderer-oreid-sample```
 7. ```yarn link "wallet-plugin-oreid"```
 
-Run the sample
+#### Run the sample
 8. ```yarn run dev```
 
 ### Editing the Wallet Plugin
