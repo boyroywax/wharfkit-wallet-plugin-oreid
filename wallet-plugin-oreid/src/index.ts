@@ -66,7 +66,7 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
     readonly metadata: WalletPluginMetadata = {
         name: 'ORE ID',
         description: 'Jump On Board!',
-        logo: `iVBORw0KGgoAAAANSUhEUgAAAOUAAAEPCAYAAAC9YQNGAAAABmJLR0QA/wD/
+        logo: `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOUAAAEPCAYAAAC9YQNGAAAABmJLR0QA/wD/
         AP+gvaeTAAA7vElEQVR42u2dCXxjV33vj640CUtYAwQIKTSEQEgJJCEsCWsy
         lLCEtkDK2qENTUKhdNLXDtMHPBgKpEnJCx0KhIGGluFRYFrSJJ7M5hl7PONN
         tryvsvZdtixbtrXL0n2/I09mZN0j3WtZV7rXPv/P5/eZsX3P+j/fs91z7yXk
