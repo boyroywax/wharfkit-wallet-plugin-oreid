@@ -462,7 +462,7 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         })
     }
     async waxLogin(context: LoginContext): Promise<WalletPluginLoginResponse> {
-        this.oreId.init().then(() => { console.log("initialized")})
+        await this.oreId.init().then(() => { console.log("initialized")})
         await this.oreId.popup.auth({provider: AuthProvider.Google}).then(() => {
             console.log("logging in to OreId")
         })

@@ -1,0 +1,6 @@
+# Commands to start on workspace startup
+tasks:
+  - name: Setup & Build
+    before: cd wallet-plugin-oreid && yarn install && yarn link
+    init: cd web-ui-renderer-oreid-sample && yarn install && yarn link "wallet-plugin-oreid"
+    command: yarn run dev
