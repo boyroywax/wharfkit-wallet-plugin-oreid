@@ -25,9 +25,14 @@
 ## Implement ORE ID Wharf Plugin into your project
 
 ### Install dependencies
-#### Append the devDependencies section in ```web-ui-renderer-oreid-sample/package.json```
+#### Append the devDependencies and peerDependencies section in ```web-ui-renderer-oreid-sample/package.json```
 ```json
 ...
+    "peerDependencies": {
+        ...
+        "oreid-js": "^4.5.0",
+        "oreid-webpopup": "^2.2.5-beta.0"
+    },
     "devDependencies": {
         ...
         "https-browserify": "1.0.0",
@@ -62,3 +67,23 @@ export default {
     ],
     ...
 }
+```
+
+#### Add the ORE ID Wallet WebUIRenderer to ```web-ui-renderer-oreid-sample/test/public/index.html```
+```javascript
+...
+const sessionKit = new SessionKit({
+    ...
+    walletPlugins: [
+        ...
+        new WebUIRenderer.WalletPluginOreId()
+    ]
+...
+```
+
+### Build and run the sample application
+```shell
+cd web-ui-renderer-oreid-sample
+yarn run build
+yarn run serve
+```
