@@ -6,7 +6,7 @@ import json from '@rollup/plugin-json'
 // import utils from '@rollup/pluginutils'
 import commonjs from '@rollup/plugin-commonjs'
 import PeerDepsExternalPlugin from 'rollup-plugin-peer-deps-external'
-// import nodePolyfills from 'rollup-plugin-node-polyfills2'
+import nodePolyfills from 'rollup-plugin-node-polyfills2'
 
 import pkg from './package.json'
 
@@ -35,7 +35,7 @@ export default [
             sourcemap: true,
             exports: 'named',
         },
-        plugins: [PeerDepsExternalPlugin(), commonjs(), typescript({target: 'es6'}), json()],
+        plugins: [nodePolyfills(), PeerDepsExternalPlugin(), commonjs(), typescript({target: 'es6'}), json()],
         external,
     },
     {
@@ -46,7 +46,7 @@ export default [
             format: 'esm',
             sourcemap: true,
         },
-        plugins: [PeerDepsExternalPlugin(), commonjs(), typescript({target: 'es2020'}), json()],
+        plugins: [nodePolyfills(), PeerDepsExternalPlugin(), commonjs(), typescript({target: 'es2020'}), json()],
         external,
     },
     {
