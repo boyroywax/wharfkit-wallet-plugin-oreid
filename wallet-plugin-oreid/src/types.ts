@@ -25,7 +25,7 @@ export interface OreIdLoginResponse extends OreIdResponse {
     autoLogin: boolean
     isTemp?: boolean
     pubKeys: PublicKeyType[]
-    userAccount: NameType
+    account: NameType
 }
 
 export interface OreIdSigningResponse extends OreIdResponse {

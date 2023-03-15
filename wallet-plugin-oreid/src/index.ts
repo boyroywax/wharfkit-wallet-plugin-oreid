@@ -1,11 +1,14 @@
 import {
     AbstractWalletPlugin,
+    Bytes,
     cancelable,
     Cancelable,
+    KeyType,
     LoginContext,
     PermissionLevel,
     ResolvedSigningRequest,
     Serializer,
+    Signature,
     SigningRequest,
     TransactContext,
     Transaction,
@@ -17,7 +20,7 @@ import {
     WalletPluginSignResponse,
 } from '@wharfkit/session'
 
-import { OreId, PopupPluginAuthSuccessResults, AuthProvider } from 'oreid-js'
+import { OreId, PopupPluginAuthSuccessResults, AuthProvider, OreIdOptions } from 'oreid-js'
 import { WebPopup } from 'oreid-webpopup'
 
 import {autoLogin, popupLogin} from './login'
@@ -28,8 +31,6 @@ import defaultTranslations from './translations.json'
 
 export interface WalletPluginOreIdOptions {
     supportedChains?: string[]
-    url?: string
-    autoUrl?: string
     loginTimeout?: number
 }
 
@@ -37,7 +38,7 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
     /**
      * The unique identifier for the wallet plugin.
      */
-    id = 'oreid'
+    id = 'wallet-plugin-oreid'
 
     /**
      * The translations for this plugin
@@ -54,8 +55,8 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         requiresPermissionSelect: false,
         // The blockchains this WalletPlugin supports
         supportedChains: [
-            '1064487b3cd1a897ce03ae5b6a865651747e2e152090f99c1d19d44e01aea5a4', // WAX (Mainnet)
-            // 'f16b1833c747c43682f4386fca9cbb327929334a762755ebec17f6f23c9b8a12', // NYI - WAX (Testnet)
+            // '1064487b3cd1a897ce03ae5b6a865651747e2e152090f99c1d19d44e01aea5a4', // WAX (Mainnet)
+            'f16b1833c747c43682f4386fca9cbb327929334a762755ebec17f6f23c9b8a12', // NYI - WAX (Testnet)
         ],
     }
 
@@ -64,7 +65,7 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
      */
     readonly metadata: WalletPluginMetadata = {
         name: 'ORE ID',
-        description: 'Step On Board!',
+        description: 'Jump On Board!',
         logo: `iVBORw0KGgoAAAANSUhEUgAAAOUAAAEPCAYAAAC9YQNGAAAABmJLR0QA/wD/
         AP+gvaeTAAA7vElEQVR42u2dCXxjV33vj640CUtYAwQIKTSEQEgJJCEsCWsy
         lLCEtkDK2qENTUKhdNLXDtMHPBgKpEnJCx0KhIGGluFRYFrSJJ7M5hl7PONN
@@ -414,21 +415,21 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
     /**
      * ORE ID Configuration
      */
-    public url = 'https://www.oreid.io'
-    public autoUrl = 'https://idm-api.myOreId.com/v1/accounts/auto-accept'
     public loginTimeout = 300000 // 5 minutes
-
-    /**
-     * ORE ID Initialization
-     */
-    public oreId = new OreId({
+    
+    readonly oreIdConfig: OreIdOptions = {
         appName: "ORE ID Wharf Kit Sample App",
         appId: "t_81af705b3f2045d5aa8c5389bec87944",
         oreIdUrl: "https://service.oreid.io",
         plugins: {
             popup: WebPopup(),
         }
-    })
+    }
+
+    /**
+     * ORE ID Object
+     */
+    public oreId = new OreId(this.oreIdConfig)
 
     /**
      * Constructor to allow overriding of plugin configuration.
@@ -438,17 +439,10 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         if (options?.supportedChains) {
             this.config.supportedChains = options.supportedChains
         }
-        if (options?.url) {
-            this.url = options.url
-        }
-        if (options?.autoUrl) {
-            this.autoUrl = options.autoUrl
-        }
         if (options?.loginTimeout) {
             this.loginTimeout = options.loginTimeout
         }
     }
-
     /**
      * Performs the wallet logic required to login and return the chain and permission level to use.
      *
@@ -471,21 +465,22 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         const t = context.ui.getTranslate(this.id)
 
         let response_raw: PopupPluginAuthSuccessResults
-        let response: OreIdLoginResponse | any
-        try {
+        let response: OreIdLoginResponse
+        // try {
             // Attempt automatic login
             context.ui.status(t('connecting', {default: 'Connecting to ORE ID'}))
             // response = await autoLogin(t, `${this.autoUrl}/login`)
-        } catch (e) {
             // Fallback to popup login
             context.ui.status(
                 t('login.popup', {default: 'Login with the ORE ID popup window'})
             )
-            // response = await popupLogin(t, `${this.url}/cloud-wallet/login/`, 35000, this.oreId)
+            response = await popupLogin(t, this.oreId)
             
-            console.log(response)
-
-        }
+            console.log('response: ', response)
+        // }
+        // catch (e) {
+        //     console.log('failed logging in with ORE ID')
+        // }
 
         // If failed due to no response or no verified response, throw error
         if (!response) {
@@ -601,20 +596,27 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
             try {
                 // Try automatic signing
                 context.ui.status(t('connecting', {default: 'Connecting to Cloud Wallet'}))
-                response = await autoSign(t, `${this.autoUrl}/signing`, resolved)
+                // response = await autoSign(t, `${this.autoUrl}/signing`, resolved)
             } catch (e) {
                 // Fallback to poup signing
                 context.ui.status(
                     t('transact.popup', {default: 'Sign with the Cloud Wallet popup window'})
                 )
-                response = await popupTransact(t, `${this.url}/cloud-wallet/signing/`, resolved)
+                // response = await popupTransact(t, `${this.url}/cloud-wallet/signing/`, resolved)
             }
         } else {
             // If automatic is not allowed use the popup
             context.ui.status(
                 t('transact.popup', {default: 'Sign with the Cloud Wallet popup window'})
             )
-            response = await popupTransact(t, `${this.url}/cloud-wallet/signing/`, resolved)
+            // response = await popupTransact(t, `${this.url}/cloud-wallet/signing/`, resolved)
+        }
+        const mockData = new Bytes(new Uint8Array([0,1,0,1,1,0,1,]))
+        response = {
+            "signatures":[ new Signature(KeyType.R1, mockData)],
+            "type": 'transfer',
+            "verified": true,
+            whitelistedContracts: []
         }
 
         // Catch unknown errors where no response is returned
