@@ -2,7 +2,11 @@
 
 ## Develop ORE ID Wharf Plugin
 
+### Quick Start
+(GitPod WorkSpace)[gitpod.io/#https://github.com/boyroywax/wharfkit-wallet-plugin-oreid]
+
 ### Setup
+
 #### Clone the Repo
 1. ```git clone <this repo.git>```
 2. ```cd wharfkit-wallet-plugin-oreid```
