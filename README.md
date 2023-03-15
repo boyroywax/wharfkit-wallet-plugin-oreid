@@ -3,7 +3,7 @@
 ## Develop ORE ID Wharf Plugin
 
 ### Quick Start
-(GitPod WorkSpace)[gitpod.io/#https://github.com/boyroywax/wharfkit-wallet-plugin-oreid]
+[GitPod WorkSpace](gitpod.io/#https://github.com/boyroywax/wharfkit-wallet-plugin-oreid)
 
 ### Setup
 
