@@ -7,6 +7,7 @@ import typescript from '@rollup/plugin-typescript'
 import replace from '@rollup/plugin-replace'
 import json from '@rollup/plugin-json'
 import pkg from '../package.json'
+import nodePolyfills from 'rollup-plugin-node-polyfills2'
 
 const production = !process.env.ROLLUP_WATCH
 
@@ -56,8 +57,21 @@ export default {
         format: 'iife',
         sourcemap: true,
         exports: 'named',
+        globals: {
+            'crypto': require.resolve("crypto-browserify"),
+            'http': require.resolve("stream-http"),
+            'https': require.resolve("https-browserify"),
+            'url': require.resolve("url"),
+            'stream': require.resolve("stream-browserify"),
+            'assert': require.resolve("assert"),
+            'tty': 'tty',
+            'util': 'util',
+            'os': require.resolve("os-browserify"),
+            'zlib': 'zlib'
+        }
     },
     plugins: [
+        nodePolyfills(),
         replaceVersion,
         svelte({
             preprocess: sveltePreprocess({sourceMap: true}),
