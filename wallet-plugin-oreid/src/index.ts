@@ -447,7 +447,6 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         if (options?.loginTimeout) {
             this.loginTimeout = options.loginTimeout
         }
-        this.oreId.init().then(() => { console.log("initialized")})
     }
 
     /**
@@ -463,6 +462,7 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         })
     }
     async waxLogin(context: LoginContext): Promise<WalletPluginLoginResponse> {
+        this.oreId.init().then(() => { console.log("initialized")})
         if (!context.chain) {
             throw new Error('A chain must be selected to login with.')
         }

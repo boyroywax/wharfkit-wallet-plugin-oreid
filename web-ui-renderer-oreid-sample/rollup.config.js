@@ -7,7 +7,7 @@ import dts from 'rollup-plugin-dts'
 import json from '@rollup/plugin-json'
 import {terser} from 'rollup-plugin-terser'
 import gzipPlugin from 'rollup-plugin-gzip'
-import nodePolyfills from 'rollup-plugin-polyfill-node'
+// import nodePolyfills from 'rollup-plugin-polyfill-node'
 import pkg from './package.json'
 
 const replaceVersion = replace({
@@ -57,7 +57,7 @@ export default [
             typescript({target: 'es6'}),
             // terser(),
             // gzipPlugin(),
-            nodePolyfills()
+            // nodePolyfills()
         ],
         external: Object.keys({...pkg.dependencies, ...pkg.peerDependencies}),
     },
