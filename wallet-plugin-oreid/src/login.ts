@@ -1,6 +1,7 @@
 import {UserInterfaceTranslateOptions} from '@wharfkit/session'
 import {OreIdLoginResponse} from './types'
 import {isValidEvent, registerCloseListener} from './utils'
+import { AuthProvider, OreId } from 'oreid-js'
 
 export async function autoLogin(
     t: (key: string, options?: UserInterfaceTranslateOptions) => string,
@@ -34,10 +35,12 @@ export async function autoLogin(
 export async function popupLogin(
     t: (key: string, options?: UserInterfaceTranslateOptions) => string,
     urlString: URL | string,
-    timeout = 300000
+    timeout = 300000,
+    oreId: OreId
 ): Promise<OreIdLoginResponse> {
     // Open the popup window
     const url = new URL(urlString)
+    // const popup = await oreId.popup.auth({provider: AuthProvider.Google})
     const popup = await window.open(url, 'WalletPluginCloudWalletPopup', 'height=800,width=600')
     if (!popup) {
         throw new Error(

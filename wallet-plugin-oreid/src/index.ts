@@ -17,6 +17,9 @@ import {
     WalletPluginSignResponse,
 } from '@wharfkit/session'
 
+import { OreId, PopupPluginAuthSuccessResults, AuthProvider } from 'oreid-js'
+import { WebPopup } from 'oreid-webpopup'
+
 import {autoLogin, popupLogin} from './login'
 import {allowAutosign, autoSign, popupTransact} from './sign'
 import {OreIdLoginResponse, OreIdSigningResponse} from './types'
@@ -60,7 +63,7 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
      * The metadata for the wallet plugin to be displayed in the user interface.
      */
     readonly metadata: WalletPluginMetadata = {
-        name: 'ORE ID Wallet',
+        name: 'ORE ID',
         description: 'Step On Board!',
         logo: `iVBORw0KGgoAAAANSUhEUgAAAOUAAAEPCAYAAAC9YQNGAAAABmJLR0QA/wD/
         AP+gvaeTAAA7vElEQVR42u2dCXxjV33vj640CUtYAwQIKTSEQEgJJCEsCWsy
@@ -409,11 +412,23 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
     }
 
     /**
-     * WAX Cloud Wallet Configuration
+     * ORE ID Configuration
      */
     public url = 'https://www.oreid.io'
     public autoUrl = 'https://idm-api.myOreId.com/v1/accounts/auto-accept'
     public loginTimeout = 300000 // 5 minutes
+
+    /**
+     * ORE ID Initialization
+     */
+    public oreId = new OreId({
+        appName: "ORE ID Wharf Kit Sample App",
+        appId: "t_81af705b3f2045d5aa8c5389bec87944",
+        oreIdUrl: "https://service.oreid.io",
+        plugins: {
+            popup: WebPopup(),
+        }
+    })
 
     /**
      * Constructor to allow overriding of plugin configuration.
@@ -447,6 +462,10 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         })
     }
     async waxLogin(context: LoginContext): Promise<WalletPluginLoginResponse> {
+        this.oreId.init().then(() => { console.log("initialized")})
+        await this.oreId.popup.auth({provider: AuthProvider.Google}).then(() => {
+            console.log("logging in to OreId")
+        })
         if (!context.chain) {
             throw new Error('A chain must be selected to login with.')
         }
@@ -454,17 +473,21 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         // Retrieve translation helper from the UI, passing the app ID
         const t = context.ui.getTranslate(this.id)
 
-        let response: OreIdLoginResponse
+        let response_raw: PopupPluginAuthSuccessResults
+        let response: OreIdLoginResponse | any
         try {
             // Attempt automatic login
-            context.ui.status(t('connecting', {default: 'Connecting to Cloud Wallet'}))
-            response = await autoLogin(t, `${this.autoUrl}/login`)
+            context.ui.status(t('connecting', {default: 'Connecting to ORE ID'}))
+            // response = await autoLogin(t, `${this.autoUrl}/login`)
         } catch (e) {
             // Fallback to popup login
             context.ui.status(
-                t('login.popup', {default: 'Login with the Cloud Wallet popup window'})
+                t('login.popup', {default: 'Login with the ORE ID popup window'})
             )
-            response = await popupLogin(t, `${this.url}/cloud-wallet/login/`)
+            response = await popupLogin(t, `${this.url}/cloud-wallet/login/`, 35000, this.oreId)
+            
+            console.log(response)
+
         }
 
         // If failed due to no response or no verified response, throw error
@@ -481,7 +504,7 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         }
 
         // Save our whitelisted contracts
-        this.data.whitelist = response.whitelistedContracts
+        // this.data.whitelist = response.whitelistedContracts
 
         return new Promise((resolve) => {
             if (!context.chain) {
@@ -491,7 +514,7 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
             resolve({
                 chain: context.chain.id,
                 permissionLevel: PermissionLevel.from({
-                    actor: response.userAccount,
+                    actor: response.account,
                     permission: 'active',
                 }),
             })

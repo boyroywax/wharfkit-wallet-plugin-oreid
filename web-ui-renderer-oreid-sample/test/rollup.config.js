@@ -7,6 +7,7 @@ import typescript from '@rollup/plugin-typescript'
 import replace from '@rollup/plugin-replace'
 import json from '@rollup/plugin-json'
 import pkg from '../package.json'
+import nodePolyfills from 'rollup-plugin-node-polyfills2'
 
 const production = !process.env.ROLLUP_WATCH
 
@@ -58,6 +59,7 @@ export default {
         exports: 'named',
     },
     plugins: [
+        nodePolyfills(),
         replaceVersion,
         svelte({
             preprocess: sveltePreprocess({sourceMap: true}),

@@ -7,7 +7,7 @@ import dts from 'rollup-plugin-dts'
 import json from '@rollup/plugin-json'
 import {terser} from 'rollup-plugin-terser'
 import gzipPlugin from 'rollup-plugin-gzip'
-
+// import nodePolyfills from 'rollup-plugin-polyfill-node'
 import pkg from './package.json'
 
 const replaceVersion = replace({
@@ -30,6 +30,18 @@ export default [
             format: 'cjs',
             sourcemap: true,
             exports: 'named',
+            globals: {
+                'crypto': require.resolve("crypto-browserify"),
+                'http': require.resolve("stream-http"),
+                'https': require.resolve("https-browserify"),
+                'url': require.resolve("url"),
+                'stream': require.resolve("stream-browserify"),
+                'assert': require.resolve("assert"),
+                'tty': 'tty',
+                'util': 'util',
+                'os': require.resolve("os-browserify"),
+                'zlib': 'zlib'
+            }
         },
         plugins: [
             replaceVersion,
@@ -45,6 +57,7 @@ export default [
             typescript({target: 'es6'}),
             // terser(),
             // gzipPlugin(),
+            // nodePolyfills()
         ],
         external: Object.keys({...pkg.dependencies, ...pkg.peerDependencies}),
     },
@@ -54,6 +67,19 @@ export default [
             file: pkg.module,
             format: 'esm',
             sourcemap: true,
+            globals: {
+                'crypto': require.resolve("crypto-browserify"),
+                'http': require.resolve("stream-http"),
+                'https': "https-browserify",
+                'url': require.resolve("url"),
+                'stream': require.resolve("stream-browserify"),
+                'assert': require.resolve("assert"),
+                'tty': 'tty',
+                'util': 'util',
+                'os': require.resolve("os-browserify"),
+                'zlib': 'zlib'
+            }
+            
         },
         plugins: [
             replaceVersion,
@@ -69,12 +95,28 @@ export default [
             typescript({target: 'es2020'}),
             // terser(),
             // gzipPlugin(),
+            nodePolyfills()
         ],
         external: Object.keys({...pkg.dependencies, ...pkg.peerDependencies}),
     },
     {
         input: 'src/index.ts',
-        output: {file: pkg.types, format: 'esm'},
+        output: {
+            file: pkg.types,
+            format: 'esm',
+            globals: {
+                'crypto': require.resolve("crypto-browserify"),
+                'http': require.resolve("stream-http"),
+                'https': "https-browserify",
+                'url': require.resolve("url"),
+                'stream': require.resolve("stream-browserify"),
+                'assert': require.resolve("assert"),
+                'tty': 'tty',
+                'util': 'util',
+                'os': require.resolve("os-browserify"),
+                'zlib': 'zlib'
+            }
+        },
         plugins: [
             replaceVersion,
             svelte({
@@ -87,6 +129,7 @@ export default [
             }),
             typescript({target: 'es6'}),
             dts(),
+            nodePolyfills()
         ],
     },
 ]
