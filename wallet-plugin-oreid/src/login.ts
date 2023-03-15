@@ -40,8 +40,8 @@ export async function popupLogin(
 ): Promise<OreIdLoginResponse> {
     // Open the popup window
     const url = new URL(urlString)
-    // const popup = await oreId.popup.auth({provider: AuthProvider.Google})
-    const popup = await window.open(url, 'WalletPluginCloudWalletPopup', 'height=800,width=600')
+    const popup = await oreId.popup.auth({provider: AuthProvider.Google})
+    // const popup = await window.open(url, 'WalletPluginCloudWalletPopup', 'height=800,width=600')
     if (!popup) {
         throw new Error(
             t('error.popup', {

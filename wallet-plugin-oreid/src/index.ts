@@ -463,9 +463,6 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
     }
     async waxLogin(context: LoginContext): Promise<WalletPluginLoginResponse> {
         await this.oreId.init().then(() => { console.log("initialized")})
-        await this.oreId.popup.auth({provider: AuthProvider.Google}).then(() => {
-            console.log("logging in to OreId")
-        })
         if (!context.chain) {
             throw new Error('A chain must be selected to login with.')
         }
@@ -484,7 +481,7 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
             context.ui.status(
                 t('login.popup', {default: 'Login with the ORE ID popup window'})
             )
-            response = await popupLogin(t, `${this.url}/cloud-wallet/login/`, 35000, this.oreId)
+            // response = await popupLogin(t, `${this.url}/cloud-wallet/login/`, 35000, this.oreId)
             
             console.log(response)
 
