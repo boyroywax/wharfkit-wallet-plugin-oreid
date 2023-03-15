@@ -57,18 +57,6 @@ export default {
         format: 'iife',
         sourcemap: true,
         exports: 'named',
-        globals: {
-            'crypto': require.resolve("crypto-browserify"),
-            'http': require.resolve("stream-http"),
-            'https': require.resolve("https-browserify"),
-            'url': require.resolve("url"),
-            'stream': require.resolve("stream-browserify"),
-            'assert': require.resolve("assert"),
-            'tty': 'tty',
-            'util': 'util',
-            'os': require.resolve("os-browserify"),
-            'zlib': 'zlib'
-        }
     },
     plugins: [
         nodePolyfills(),
