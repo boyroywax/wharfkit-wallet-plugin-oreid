@@ -23,7 +23,7 @@ C.) Adding ORE ID Wharf Wallet Plugin to ```example-vite-svelte-ts```
 ## A. Develop ORE ID Wharf Plugin
 
 ### Quick Start
-[GitPod WorkSpace](https://gitpod.io/#https://github.com/boyroywax/wharfkit-wallet-plugin-oreid)
+[GitPod WorkSpace](https://gitpod.io/#https://github.com/boyroywax/wharfkit-wallet-plugin-oreid) - Launch this project in a cloud instance of VS Code.
 
 ### Project Synopsis
 

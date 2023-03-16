@@ -527,6 +527,7 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         context: TransactContext
     ): Cancelable<WalletPluginSignResponse> {
         const promise = this.waxSign(resolved, context)
+        console.log("resolved: ", resolved, "\ncontext: ", context)
         return cancelable(promise, (canceled) => {
             throw canceled
         })
@@ -595,25 +596,26 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         }
 
         // Check if automatic signing is allowed
-        if (await allowAutosign(resolved, this.data)) {
-            try {
-                // Try automatic signing
-                context.ui.status(t('connecting', {default: 'Connecting to Cloud Wallet'}))
-                // response = await autoSign(t, `${this.autoUrl}/signing`, resolved)
-            } catch (e) {
-                // Fallback to poup signing
-                context.ui.status(
-                    t('transact.popup', {default: 'Sign with the Cloud Wallet popup window'})
-                )
-                // response = await popupTransact(t, `${this.url}/cloud-wallet/signing/`, resolved)
-            }
-        } else {
+        // if (await allowAutosign(resolved, this.data)) {
+        //     try {
+        //         // Try automatic signing
+        //         context.ui.status(t('connecting', {default: 'Connecting to Cloud Wallet'}))
+        //         // response = await autoSign(t, `${this.autoUrl}/signing`, resolved)
+        //     } catch (e) {
+        //         // Fallback to poup signing
+        //         context.ui.status(
+        //             t('transact.popup', {default: 'Sign with the Cloud Wallet popup window'})
+        //         )
+        //         // response = await popupTransact(t, `${this.url}/cloud-wallet/signing/`, resolved)
+        //     }
+        // } else {
             // If automatic is not allowed use the popup
             context.ui.status(
                 t('transact.popup', {default: 'Sign with the Cloud Wallet popup window'})
             )
-            // response = await popupTransact(t, `${this.url}/cloud-wallet/signing/`, resolved)
-        }
+            response = await popupTransact(t, resolved, 3000000, this.oreId, context.chain)
+        // }
+        console.log('signing response: ', response)
         const mockData = new Bytes(new Uint8Array([0,1,0,1,1,0,1,]))
         response = {
             "signatures":[ new Signature(KeyType.R1, mockData)],
