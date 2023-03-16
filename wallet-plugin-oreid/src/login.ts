@@ -1,7 +1,8 @@
 import {Bytes, Name, PublicKeyType, UInt64, UserInterfaceTranslateOptions} from '@wharfkit/session'
 import {OreIdLoginResponse} from './types'
 import {isValidEvent, registerCloseListener} from './utils'
-import { AuthProvider, OreId } from 'oreid-js'
+import { AuthProvider, OreId, PopupPluginAuthSuccessResults, UserPermissionForChainAccount } from 'oreid-js'
+import { base58_to_binary } from 'base58-js'
 
 export async function autoLogin(
     t: (key: string, options?: UserInterfaceTranslateOptions) => string,
@@ -36,69 +37,66 @@ export async function popupLogin(
     t: (key: string, options?: UserInterfaceTranslateOptions) => string,
     // urlString: URL | string,
     // timeout = 300000,
-    oreId: OreId
+    oreId: OreId,
+    chain: any
 ): Promise<OreIdLoginResponse> {
-    // Open the popup window
-    // const url = new URL(urlString)
-    const response_raw = await oreId.popup.auth({provider: AuthProvider.Google})
+    // Open the ORE ID Auth popup window
+    const response_raw: PopupPluginAuthSuccessResults = await oreId.popup.auth({provider: AuthProvider.Google})
     console.log('resposne raw: ', response_raw)
-    // const popup = await window.open(url, 'WalletPluginCloudWalletPopup', 'height=800,width=600')
-    // if (!popup) {
-    //     throw new Error(
-    //         t('error.popup', {
-    //             default:
-    //                 'Unable to open the popup window. Check your browser settings and try again.',
-    //         })
-    //     )
-    // }
-    // Return a promise that either times out or resolves when the popup resolves
-    // return new Promise<OreIdLoginResponse>((resolve, reject) => {
-        // const closeListener = registerCloseListener(t, popup, reject)
-        // // Event handler awaiting response from WCW
-        // const handleEvent = (event: MessageEvent) => {
-        //     if (!isValidEvent(event, url, popup)) {
-        //         return
-        //     }
-        //     try {
-        //         resolve(event.data)
-        //     } catch (e) {
-        //         reject(e)
-        //     } finally {
-        //         window.removeEventListener('message', handleEvent)
-        //         clearTimeout(autoCancel)
-        //         clearInterval(closeListener)
-        //     }
-        // }
-        // // Automatically cancel request after 5 minutes to cleanup windows/promises
-        // const autoCancel = setTimeout(() => {
-        //     popup.close()
-        //     window.removeEventListener('message', handleEvent)
-        //     reject(
-        //         new Error(
-        //             t('error.timeout', {
-        //                 default:
-        //                     'The request has timed out after {{timeout}} seconds. Please try again.',
-        //                 timeout: timeout / 1000,
-        //             })
-        //         )
-        //     )
-        // }, timeout)
-        // Add event listener awaiting WCW Response
-        // window.addEventListener('message', handleEvent)
-        const publicKeys: PublicKeyType = {
-            type: 'R1',
-            compressed: new Uint8Array([0,1,1,1,1,1,1,0,1])
-        }
-        console.log(publicKeys)
-        // const accountName: Name = new Name(new UInt64(new Bytes(new Uint8Array([0,1,1,1,1,1,1,0]))))
-        // console.log(accountName)
-        return({
-            autoLogin: false,
-            isTemp: false,
-            pubKeys: [ publicKeys ],
-            account: 'jamesataikon',
-            verified: true,
-            whitelistedContracts: []
-        })
+
+    console.log("chain: ", chain)
+
+    let oreIDChainName: string
+
+    switch(chain.name) {
+        case('WAX (Testnet)'):
+            oreIDChainName = 'wax_test'
+            break;
+
+        case('ORE (Testnet)'):
+            oreIDChainName = 'ore_test'
+            break;
+
+        default:
+            oreIDChainName = 'ore_test'
+            break;
     }
+
+    const signingAccount = response_raw.user.chainAccounts.find(
+        (ca) => ca.chainNetwork === oreIDChainName
+    );
+
+    const pubKeys: UserPermissionForChainAccount[] | undefined = signingAccount?.permissions
+    console.log('pubKeys: ', pubKeys)
+    
+    let publicKeys: PublicKeyType
+    let compressed: any
+
+    // try {
+        if (pubKeys){
+            // compressed = base58_to_binary(pubKeys[0].publicKey)
+            compressed = pubKeys[0].publicKey
+
+            publicKeys = {
+                type: 'R1',
+                compressed: compressed
+            }
+            console.log(publicKeys)
+        }
+    // }
+    else {
+        publicKeys = {
+            type: 'R1',
+            compressed: base58_to_binary("abc123")
+        }
+    }
+    return({
+        autoLogin: false,
+        isTemp: false,
+        pubKeys: [ publicKeys ],
+        account: signingAccount?.chainAccount || "",
+        verified: true,
+        whitelistedContracts: []
+    })
+}
 

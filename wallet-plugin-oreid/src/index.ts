@@ -56,7 +56,11 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         // The blockchains this WalletPlugin supports
         supportedChains: [
             '1064487b3cd1a897ce03ae5b6a865651747e2e152090f99c1d19d44e01aea5a4', // WAX (Mainnet)
-            'f16b1833c747c43682f4386fca9cbb327929334a762755ebec17f6f23c9b8a12', // NYI - WAX (Testnet)
+            'f16b1833c747c43682f4386fca9cbb327929334a762755ebec17f6f23c9b8a12', // WAX (Testnet)
+            '8fc6dce7942189f842170de953932b1f66693ad3788f766e777b6f9d22335c02', // UXNetwork (Mainnet)
+            '4667b205c6838ef70ff7988f6e8257e8be0e1284a2f59699054a018f743b1d11', // TELOS (Mainnet)
+            'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906', // EOS (Mainnet)
+            'a6df478d5593b4efb1ea20d13ba8a3efc1364ee0bf7dbd85d8d756831c0e3256', // ORE (Testnet)
         ],
     }
 
@@ -419,7 +423,7 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
     
     readonly oreIdConfig: OreIdOptions = {
         appName: "ORE ID Wharf Kit Sample App",
-        appId: "t_81af705b3f2045d5aa8c5389bec87944",
+        appId: "t_515b4ffcfdbf42a986a927481e6baf82",
         oreIdUrl: "https://service.oreid.io",
         plugins: {
             popup: WebPopup(),
@@ -473,7 +477,7 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
             context.ui.status(
                 t('login.popup', {default: 'Login with the ORE ID popup window'})
             )
-            response = await popupLogin(t, this.oreId)
+            response = await popupLogin(t, this.oreId, context.chain)
             
             console.log('response: ', response)
         // }
