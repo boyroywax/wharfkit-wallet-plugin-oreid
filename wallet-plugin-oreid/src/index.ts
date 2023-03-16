@@ -611,35 +611,35 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         // } else {
             // If automatic is not allowed use the popup
             context.ui.status(
-                t('transact.popup', {default: 'Sign with the Cloud Wallet popup window'})
+                t('transact.popup', {default: 'Sign with ORE ID popup window'})
             )
             response = await popupTransact(t, resolved, 3000000, this.oreId, context.chain)
         // }
         console.log('signing response: ', response)
-        const mockData = new Bytes(new Uint8Array([0,1,0,1,1,0,1,]))
-        response = {
-            "signatures":[ new Signature(KeyType.R1, mockData)],
-            "type": 'transfer',
-            "verified": true,
-            whitelistedContracts: []
-        }
+        // const mockData = new Bytes(new Uint8Array([0,1,0,1,1,0,1,]))
+        // response = {
+        //     "signatures":[ new Signature(KeyType.R1, mockData)],
+        //     "type": 'transfer',
+        //     "verified": true,
+        //     whitelistedContracts: []
+        // }
 
         // Catch unknown errors where no response is returned
         if (!response) {
-            throw new Error(t('login.error.response', {default: 'Cloud Wallet failed to respond'}))
+            throw new Error(t('login.error.response', {default: 'ORE ID failed to respond'}))
         }
 
         // Ensure the response is verified, if not the user most likely cancelled the request
         if (!response.verified) {
             throw new Error(
                 t('error.closed', {
-                    default: 'The Cloud Wallet was closed before the request was completed',
+                    default: 'ORE ID was closed before the request was completed',
                 })
             )
         }
 
         // Save our whitelisted contracts
-        this.data.whitelist = response.whitelistedContracts
+        // this.data.whitelist = response.whitelistedContracts
 
         // Return the response from the API
         return response
