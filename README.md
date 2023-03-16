@@ -48,7 +48,7 @@ C.) Adding ORE ID Wharf Wallet Plugin to ```example-vite-svelte-ts```
 ```text
 💡 Advanced - Delayed Account creation
 💡 Advanced - Custodial Account support
-💡 Advanced - Support for ORE Network (Testnet and Mainnet)
+💡 Advanced - Support for ORE Network (Testnet and Mainnet) (PR for @wharfkit/session)
 ```
 
 #### To-Do's
@@ -57,6 +57,8 @@ C.) Adding ORE ID Wharf Wallet Plugin to ```example-vite-svelte-ts```
 🔵 Developer Documentation for Integration of `teamaikon/wallet-plugin-oreid` into project using `@wharfkit/web-ui-renderer`
 🔵 Implement Reusable accounts as default account structure
 🔵 Implement Whitelisting functionality for silent/auto signing
+🟠 Clean up old eosjs dependencies, upgrade to greymass/eosjs
+🟠 Remove bloated and old dependencies in oreid-js package
 ```
 
 ### Setup
@@ -153,3 +155,22 @@ yarn run serve
 ---
 
 ## C. Adding ORE ID Wharf Wallet Plugin to ```example-vite-svelte-ts```
+
+1. Edit ```src/lib/Login.svelte``` file to include ORE ID
+```typescript
+import { WalletPluginOreId } from "wallet-plugin-oreid"
+```
+
+2. Add the ```WalletPluginOreid()``` to ``SessionKit``` 
+```typescript
+...
+    const sessionKit = new SessionKit({
+    ...
+        walletPlugins: [
+            ...
+            new WalletPluginOreId()
+        ],
+    ...
+    })
+...
+```
