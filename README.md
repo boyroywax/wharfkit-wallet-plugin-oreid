@@ -1,9 +1,63 @@
 # wallet-plugin-oreid work repo
 
-## Develop ORE ID Wharf Plugin
+## Index
+```text
+A.) Develop ORE ID Wharf Plugin
+    1.) Quickstart
+    2.) Project Synopsis
+        a.) Features
+        b.) Ideas
+        c.) To-Dos
+    3.) Setup
+    4.) Editing the Wallet Plugin
+B.) Implement ORE ID Wharf Plugin into `web-ui-renderer-oreid-sample`
+    1.) Install dependencies
+    2.) Add nodePolyfills()
+    3.) Add the ORE ID Wallet WebUIRenderer
+    4.) Build and Run the sample application
+C.) Adding ORE ID Wharf Wallet Plugin to ```example-vite-svelte-ts```
+```
+
+---
+
+## A. Develop ORE ID Wharf Plugin
 
 ### Quick Start
 [GitPod WorkSpace](https://gitpod.io/#https://github.com/boyroywax/wharfkit-wallet-plugin-oreid)
+
+### Project Synopsis
+
+#### Features
+```text
+✅ Login - ORE ID Auth Login/SignUp
+✅ Login - Blockchain Selector
+⛔️ Login - Oauth Provider Selector
+⛔️ Login - Permission Selector
+⛔️ Login - Auto-login
+⛔️ Login - ORE ID Auth Reusable account support
+⛔️ Login - Load contract whitelist upon login
+⛔️ Transaction - ORE ID Non-Custodial Transaction Signing
+⛔️ Transaction - Support for Transact plugins
+⛔️ Transaction - Whitelist contract actions for silent signing
+⛔️ Transaction - Silent Signing/Whitelist Auto Signing
+⛔️ ORE ID - Pass in oreId object to plugin
+⛔️ ORE ID - Pass in appId/Public API Key to oreId object
+```
+
+#### Ideas
+```text
+💡 Advanced - Delayed Account creation
+💡 Advanced - Custodial Account support
+💡 Advanced - Support for ORE Network (Testnet and Mainnet)
+```
+
+#### To-Do's
+```text
+🔵 Publish `teamaikon/wallet-plugin-oreid` package to NPM
+🔵 Developer Documentation for Integration of `teamaikon/wallet-plugin-oreid` into project using `@wharfkit/web-ui-renderer`
+🔵 Implement Reusable accounts as default account structure
+🔵 Implement Whitelisting functionality for silent/auto signing
+```
 
 ### Setup
 
@@ -26,7 +80,11 @@
 2. ```make```
 3. The sample should automatically refresh with the new changes.
 
-## Implement ORE ID Wharf Plugin into ```web-ui-renderer-oreid-sample```
+
+---
+
+
+## B. Implement ORE ID Wharf Plugin into ```web-ui-renderer-oreid-sample```
 
 ### Install dependencies
 #### Append the devDependencies and peerDependencies section in ```web-ui-renderer-oreid-sample/package.json```
@@ -73,7 +131,7 @@ export default {
 }
 ```
 
-#### Add the ORE ID Wallet WebUIRenderer to ```web-ui-renderer-oreid-sample/test/public/index.html```
+### Add the ORE ID Wallet WebUIRenderer to ```web-ui-renderer-oreid-sample/test/public/index.html```
 ```javascript
 ...
 const sessionKit = new SessionKit({
@@ -91,3 +149,7 @@ cd web-ui-renderer-oreid-sample
 yarn run build
 yarn run serve
 ```
+
+---
+
+## C. Adding ORE ID Wharf Wallet Plugin to ```example-vite-svelte-ts```
