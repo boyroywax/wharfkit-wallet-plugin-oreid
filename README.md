@@ -26,7 +26,7 @@
 2. ```make```
 3. The sample should automatically refresh with the new changes.
 
-## Implement ORE ID Wharf Plugin into your project
+## Implement ORE ID Wharf Plugin into ```web-ui-renderer-oreid-sample```
 
 ### Install dependencies
 #### Append the devDependencies and peerDependencies section in ```web-ui-renderer-oreid-sample/package.json```

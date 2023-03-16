@@ -51,15 +51,19 @@ export async function popupLogin(
     switch(chain.name) {
         case('WAX (Testnet)'):
             oreIDChainName = 'wax_test'
-            break;
+            break
 
         case('ORE (Testnet)'):
             oreIDChainName = 'ore_test'
-            break;
+            break
+
+        case('EOS (Mainnet)'):
+            oreIDChainName = 'eos_main'
+            break
 
         default:
-            oreIDChainName = 'ore_test'
-            break;
+            oreIDChainName = 'ore_main'
+            break
     }
 
     const signingAccount = response_raw.user.chainAccounts.find(
@@ -70,7 +74,7 @@ export async function popupLogin(
     console.log('pubKeys: ', pubKeys)
     
     let publicKeys: PublicKeyType
-    let compressed: any
+    let compressed: any = "EOS6XXXXXXXXXXXXXXXXXXXXXXX"
 
     // try {
         if (pubKeys){
@@ -87,7 +91,7 @@ export async function popupLogin(
     else {
         publicKeys = {
             type: 'R1',
-            compressed: base58_to_binary("abc123")
+            compressed: compressed
         }
     }
     return({
