@@ -1,13 +1,11 @@
 # List the start up tasks. Learn more: https://www.gitpod.io/docs/configure/workspaces/tasks
 tasks:
   - name: Set up wallet-plugin-oreid
-    command: cd wallet-plugin-oreid && yarn install
+    init: cd wallet-plugin-oreid && yarn install
+    command: yarn link
   - name: Set up web-ui-renderer-oreid-sample
-    command: cd web-ui-renderer-oreid-sample && yarn install
-  - name: Link deps
-    command: cd wallet-plugin-oreid && yarn link && cd ../web-ui-renderer-oreid-sample && yarn link "wallet-plugin-oreid"
-  - name: run web-ui-renderer-oreid-sample templates
-    command: cd web-ui-renderer-oreid-sample && yarn run dev
+    init: cd web-ui-renderer-oreid-sample && yarn install
+    command: yarn link "wallet-plugin-oreid" && yarn run dev
 # List the ports to expose. Learn more: https://www.gitpod.io/docs/configure/workspaces/ports
 ports:
   - name: Frontend
