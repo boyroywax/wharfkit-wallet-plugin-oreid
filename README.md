@@ -59,6 +59,7 @@ C.) Adding ORE ID Wharf Wallet Plugin to ```example-vite-svelte-ts```
 🔵 Implement Whitelisting functionality for silent/auto signing
 🟠 Clean up old eosjs dependencies, upgrade to greymass/eosjs
 🟠 Remove bloated and old dependencies in oreid-js package
+🟠 Re-useable account work for ORE ID
 ```
 
 ### Setup
@@ -89,7 +90,7 @@ C.) Adding ORE ID Wharf Wallet Plugin to ```example-vite-svelte-ts```
 ## B. Implement ORE ID Wharf Plugin into ```web-ui-renderer-oreid-sample```
 
 ### Install dependencies
-#### Append the devDependencies and peerDependencies section in ```web-ui-renderer-oreid-sample/package.json```
+1. Append the devDependencies and peerDependencies section in ```web-ui-renderer-oreid-sample/package.json```
 ```json
 ...
     "peerDependencies": {
@@ -108,20 +109,20 @@ C.) Adding ORE ID Wharf Wallet Plugin to ```example-vite-svelte-ts```
         "rollup-plugin-node-polyfills2": "^0.1.0"
     }
 ```
-#### Install the deps in the ```web-ui-renderer-oreid-sample``` folder
+2.  Install the deps in the ```web-ui-renderer-oreid-sample``` folder
 ```shell
 yarn install
 ```
 
 ### Add nodePolyfills()
-#### Declare the import
+3. Declare the import
 ```javascript
 ...
 import nodePolyfills from 'rollup-plugin-node-polyfills2'
 ...
 ```
 
-#### Append plugins section of ```web-ui-renderer-oreid-sample/test/rollup.config.js```
+4. Append plugins section of ```web-ui-renderer-oreid-sample/test/rollup.config.js```
 ```javascript
 export default {
     ...
@@ -133,7 +134,8 @@ export default {
 }
 ```
 
-### Add the ORE ID Wallet WebUIRenderer to ```web-ui-renderer-oreid-sample/test/public/index.html```
+### Add the ORE ID Wallet WebUIRenderer
+5. Make updates to ```web-ui-renderer-oreid-sample/test/public/index.html```
 ```javascript
 ...
 const sessionKit = new SessionKit({
