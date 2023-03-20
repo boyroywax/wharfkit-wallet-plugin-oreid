@@ -1,13 +1,13 @@
 import {Bytes, Name, PublicKeyType, UInt64, UserInterfaceTranslateOptions} from '@wharfkit/session'
 import {OreIdLoginResponse} from './types'
 import {isValidEvent, registerCloseListener} from './utils'
-import { AuthProvider, OreId, PopupPluginAuthSuccessResults, UserPermissionForChainAccount } from 'oreid-js'
-import { base58_to_binary } from 'base58-js'
+import { AuthProvider, LoginWithOreIdResult, OreId, PopupPluginAuthSuccessResults, UserPermissionForChainAccount } from 'oreid-js'
 
 export async function autoLogin(
     t: (key: string, options?: UserInterfaceTranslateOptions) => string,
-    urlString: URL | string
-): Promise<OreIdLoginResponse> {
+    // urlString: URL | string
+    oreId: OreId
+): Promise<OreIdLoginResponse | undefined> {
     // TODO: Figure out what temp accounts are
     //
     // if (this.returnTempAccount) {
@@ -15,22 +15,45 @@ export async function autoLogin(
     // } else {
     //   url.search = "";
     // }
-    const url = new URL(urlString)
-    const response = await fetch(String(url), {
-        credentials: 'include',
-        method: 'get',
-    })
-    if (!response.ok) {
-        throw new Error(
-            t('error.endpoint', {
-                default: `Login Endpoint Error {{status}} - {{statusText}}`,
-                status: response.status,
-                statusText: response.statusText,
-            })
-        )
+    if (!oreId.isInitialized) {
+        await oreId.init()
     }
-    const data = await response.json()
-    return data
+    if (oreId.auth.isLoggedIn) {
+        const perms = oreId.localState.cachedaccessToken
+        const autoLoginResult: LoginWithOreIdResult = await oreId.auth.loginWithToken({
+            accessToken: perms,
+        })
+        console.log(perms)
+        console.log(autoLoginResult)
+        const userAccount = oreId.auth.user
+
+        return({
+            autoLogin: true,
+            isTemp: false,
+            // eslint-disable-next-line prettier/prettier
+            pubKeys: [ "" ],
+            account: userAccount.accountName,
+            verified: true,
+            whitelistedContracts: [],
+        })
+    }
+    // const url = new URL(urlString)
+    // const response = await fetch(String(url), {
+    //     credentials: 'include',
+    //     method: 'get',
+    // })
+    // if (!response.ok) {
+    //     throw new Error(
+    //         t('error.endpoint', {
+    //             default: `Login Endpoint Error {{status}} - {{statusText}}`,
+    //             status: response.status,
+    //             statusText: response.statusText,
+    //         })
+    //     )
+    // }
+    // const data = await response.json()
+    // return data
+    
 }
 
 export async function popupLogin(
@@ -95,7 +118,7 @@ export async function popupLogin(
         }
     }
     return({
-        autoLogin: false,
+        autoLogin: true,
         isTemp: false,
         pubKeys: [ publicKeys ],
         account: signingAccount?.chainAccount || "",

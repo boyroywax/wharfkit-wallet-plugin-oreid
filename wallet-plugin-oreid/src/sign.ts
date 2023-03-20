@@ -10,12 +10,18 @@ import {
     WalletPluginData,
 } from '@wharfkit/session'
 
+import {
+    ChainNetwork,
+    OreId,
+    PopupPluginSignParams,
+    PopupPluginSignResults,
+    Transaction,
+    TransactionData,
+    TransactionSignOptions,
+} from 'oreid-js'
+
 import {OreIdSigningResponse} from './types'
 import {getCurrentTime, isValidEvent, registerCloseListener} from './utils'
-import { ChainNetwork, OreId, PopupPluginSignParams, PopupPluginSignResults, Transaction, TransactionData, TransactionSignOptions } from 'oreid-js'
-
-import { Api, JsonRpc } from 'eosjs'
-import {JsSignatureProvider} from 'eosjs/dist/eosjs-jssig'
 
 
 export async function allowAutosign(
@@ -112,20 +118,20 @@ export async function popupTransact(
     // const signatureProvider = new JsSignatureProvider(["5JN4DMQQDf1bB9VQnN76nn5EMhXXeW5WYzmKfH378qbQ8FD3JUw"])
     // const WAXApi = new Api({rpc: jsonRpc, signatureProvider: signatureProvider})
 
+    
+
     const transactionToSign = {
         account: request.transaction.actions[0].account,
         name: request.transaction.actions[0].name.toString(),
         authorization: request.transaction.actions[0].authorization,
-        // data: request.transaction.actions[0].data,
-        data: mockTransactionDataForAction
+        data: request.resolvedTransaction.actions[0].data,
+        // data: mockTransactionDataForAction
     }
 
     const transactionFields: Action = new Action(transactionToSign)
 
     // const deserializedAction = await WAXApi.deserializeActions([transactionFields.toJSON()])
     // console.log('deserializedAction: ', deserializedAction)
-
-    
 
     const signTransactionOptions: TransactionSignOptions = {
         broadcast: false,
@@ -149,7 +155,7 @@ export async function popupTransact(
     console.log(transaction.data)
 
     const signParams: PopupPluginSignParams = {
-        transaction
+        transaction,
     }
 
     console.log('transaction_to_sign: ', transaction)

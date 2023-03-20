@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
     AbstractWalletPlugin,
     Bytes,
@@ -20,8 +21,8 @@ import {
     WalletPluginSignResponse,
 } from '@wharfkit/session'
 
-import { OreId, PopupPluginAuthSuccessResults, AuthProvider, OreIdOptions } from 'oreid-js'
-import { WebPopup } from 'oreid-webpopup'
+import {AuthProvider, OreId, OreIdOptions, PopupPluginAuthSuccessResults} from 'oreid-js'
+import {WebPopup} from 'oreid-webpopup'
 
 import {autoLogin, popupLogin} from './login'
 import {allowAutosign, autoSign, popupTransact} from './sign'
@@ -420,14 +421,14 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
      * ORE ID Configuration
      */
     public loginTimeout = 300000 // 5 minutes
-    
+
     readonly oreIdConfig: OreIdOptions = {
-        appName: "ORE ID Wharf Kit Sample App",
-        appId: "t_515b4ffcfdbf42a986a927481e6baf82",
-        oreIdUrl: "https://service.oreid.io",
+        appName: 'ORE ID Wharf Kit Sample App',
+        appId: 't_515b4ffcfdbf42a986a927481e6baf82',
+        oreIdUrl: 'https://service.oreid.io',
         plugins: {
             popup: WebPopup(),
-        }
+        },
     }
 
     /**
@@ -460,7 +461,9 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         })
     }
     async waxLogin(context: LoginContext): Promise<WalletPluginLoginResponse> {
-        await this.oreId.init().then(() => { console.log("initialized")})
+        await this.oreId.init().then(() => {
+            console.log('initialized')
+        })
         if (!context.chain) {
             throw new Error('A chain must be selected to login with.')
         }
@@ -468,25 +471,31 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         // Retrieve translation helper from the UI, passing the app ID
         const t = context.ui.getTranslate(this.id)
 
-        let response: OreIdLoginResponse
-        // try {
+        let response: OreIdLoginResponse | undefined = undefined
+        try {
             // Attempt automatic login
             context.ui.status(t('connecting', {default: 'Connecting to ORE ID'}))
-            // response = await autoLogin(t, `${this.autoUrl}/login`)
-            // Fallback to popup login
-            context.ui.status(
-                t('login.popup', {default: 'Login with the ORE ID popup window'})
-            )
-            response = await popupLogin(t, this.oreId, context.chain)
-            
-            console.log('response: ', response)
-        // }
-        // catch (e) {
-        //     console.log('failed logging in with ORE ID')
-        // }
+            response = await autoLogin(t, this.oreId)
+
+            if (response == undefined) {
+                // Fallback to popup login
+                // if (!this.oreId.auth.isLoggedIn) {
+                    context.ui.status(t('login.popup', {default: 'Login with the ORE ID popup window'}))
+                    // eslint-disable-next-line prefer-const
+                    response = await popupLogin(t, this.oreId, context.chain)
+
+                    console.log('response: ', response)
+}
+            // }
+        }
+        catch (e) {
+            console.log('failed logging in with ORE ID: ', e)
+        }
+
+        
 
         // If failed due to no response or no verified response, throw error
-        if (!response) {
+        if (!response || response === undefined) {
             throw new Error(t('login.error.response', {default: 'Cloud Wallet failed to respond'}))
         }
 
@@ -527,7 +536,8 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         context: TransactContext
     ): Cancelable<WalletPluginSignResponse> {
         const promise = this.waxSign(resolved, context)
-        console.log("resolved: ", resolved, "\ncontext: ", context)
+        // Returns the resolved and context data
+        console.log('resolved: ', resolved, '\ncontext: ', context)
         return cancelable(promise, (canceled) => {
             throw canceled
         })
@@ -609,11 +619,9 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         //         // response = await popupTransact(t, `${this.url}/cloud-wallet/signing/`, resolved)
         //     }
         // } else {
-            // If automatic is not allowed use the popup
-            context.ui.status(
-                t('transact.popup', {default: 'Sign with ORE ID popup window'})
-            )
-            response = await popupTransact(t, resolved, 3000000, this.oreId, context.chain)
+        // If automatic is not allowed use the popup
+        context.ui.status(t('transact.popup', {default: 'Sign with ORE ID popup window'}))
+        response = await popupTransact(t, resolved, 3000000, this.oreId, context.chain)
         // }
         console.log('signing response: ', response)
         // const mockData = new Bytes(new Uint8Array([0,1,0,1,1,0,1,]))
