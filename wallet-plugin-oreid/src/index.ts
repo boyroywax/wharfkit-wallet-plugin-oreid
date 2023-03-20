@@ -477,7 +477,7 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
             context.ui.status(t('connecting', {default: 'Connecting to ORE ID'}))
             response = await autoLogin(t, this.oreId)
 
-            if (response == undefined) {
+            if (response === undefined) {
                 // Fallback to popup login
                 // if (!this.oreId.auth.isLoggedIn) {
                     context.ui.status(t('login.popup', {default: 'Login with the ORE ID popup window'}))
