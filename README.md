@@ -33,10 +33,11 @@ C.) Adding ORE ID Wharf Wallet Plugin to ```example-vite-svelte-ts```
 ✅ Login - Blockchain Selector
 ⛔️ Login - Oauth Provider Selector
 ⛔️ Login - Permission Selector
-⛔️ Login - Auto-login
+✅ Login - Auto-login 
+⛔️ Login - Auto-login bypass
 ⛔️ Login - ORE ID Auth Reusable account support
 ⛔️ Login - Load contract whitelist upon login
-⛔️ Transaction - ORE ID Non-Custodial Transaction Signing
+✅ Transaction - ORE ID Non-Custodial Transaction Signing
 ⛔️ Transaction - Support for Transact plugins
 ⛔️ Transaction - Whitelist contract actions for silent signing
 ⛔️ Transaction - Silent Signing/Whitelist Auto Signing
