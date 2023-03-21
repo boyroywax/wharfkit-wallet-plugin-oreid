@@ -485,8 +485,7 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
                     response = await popupLogin(t, this.oreId, context.chain)
 
                     console.log('response: ', response)
-}
-            // }
+            }
         }
         catch (e) {
             console.log('failed logging in with ORE ID: ', e)
@@ -536,7 +535,8 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         context: TransactContext
     ): Cancelable<WalletPluginSignResponse> {
         const promise = this.waxSign(resolved, context)
-        // Returns the resolved and context data
+
+        // Prints the resolved and context data
         console.log('resolved: ', resolved, '\ncontext: ', context)
         return cancelable(promise, (canceled) => {
             throw canceled
@@ -606,19 +606,6 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         }
 
         // Check if automatic signing is allowed
-        // if (await allowAutosign(resolved, this.data)) {
-        //     try {
-        //         // Try automatic signing
-        //         context.ui.status(t('connecting', {default: 'Connecting to Cloud Wallet'}))
-        //         // response = await autoSign(t, `${this.autoUrl}/signing`, resolved)
-        //     } catch (e) {
-        //         // Fallback to poup signing
-        //         context.ui.status(
-        //             t('transact.popup', {default: 'Sign with the Cloud Wallet popup window'})
-        //         )
-        //         // response = await popupTransact(t, `${this.url}/cloud-wallet/signing/`, resolved)
-        //     }
-        // } else {
         // If automatic is not allowed use the popup
         context.ui.status(t('transact.popup', {default: 'Sign with ORE ID popup window'}))
         response = await popupTransact(t, resolved, 3000000, this.oreId, context.chain)

@@ -19,11 +19,10 @@ export async function autoLogin(
         await oreId.init()
     }
     if (oreId.auth.isLoggedIn) {
-        const perms = oreId.localState.cachedaccessToken
+        const accessToken = oreId.localState.cachedaccessToken
         const autoLoginResult: LoginWithOreIdResult = await oreId.auth.loginWithToken({
-            accessToken: perms,
+            accessToken: accessToken,
         })
-        console.log(perms)
         console.log(autoLoginResult)
         const userAccount = oreId.auth.user
 
@@ -100,16 +99,15 @@ export async function popupLogin(
     let compressed: any = "EOS6XXXXXXXXXXXXXXXXXXXXXXX"
 
     // try {
-        if (pubKeys){
-            // compressed = base58_to_binary(pubKeys[0].publicKey)
-            compressed = pubKeys[0].publicKey
+    if (pubKeys) {
+        compressed = pubKeys[0].publicKey
 
-            publicKeys = {
-                type: 'R1',
-                compressed: compressed
-            }
-            console.log(publicKeys)
+        publicKeys = {
+            type: 'R1',
+            compressed: compressed,
         }
+        console.log(publicKeys)
+    }
     // }
     else {
         publicKeys = {

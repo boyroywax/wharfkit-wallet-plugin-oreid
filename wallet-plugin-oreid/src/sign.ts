@@ -107,65 +107,37 @@ export async function popupTransact(
     chain: any
 ): Promise<OreIdSigningResponse> {
 
-    const mockTransactionDataForAction = {
-        from: request.signer.actor.toString(),
-        to: request.signer.actor.toString(),
-        quantity: '0.00000001 WAX',
-        memo: 'hello from ORE ID',
-    }
-
-    // const jsonRpc = new JsonRpc("https://waxtestnet.greymass.com")
-    // const signatureProvider = new JsSignatureProvider(["5JN4DMQQDf1bB9VQnN76nn5EMhXXeW5WYzmKfH378qbQ8FD3JUw"])
-    // const WAXApi = new Api({rpc: jsonRpc, signatureProvider: signatureProvider})
-
-    
-
     const transactionToSign = {
         account: request.transaction.actions[0].account,
         name: request.transaction.actions[0].name.toString(),
         authorization: request.transaction.actions[0].authorization,
         data: request.resolvedTransaction.actions[0].data,
-        // data: mockTransactionDataForAction
     }
 
     const transactionFields: Action = new Action(transactionToSign)
-
-    // const deserializedAction = await WAXApi.deserializeActions([transactionFields.toJSON()])
-    // console.log('deserializedAction: ', deserializedAction)
 
     const signTransactionOptions: TransactionSignOptions = {
         broadcast: false,
         returnSignedTransaction: true,
     }
 
-    const transactionData = {
+    const transactionData: TransactionData = {
         chainAccount: request.signer.actor.toString(),
         chainNetwork: ChainNetwork.WaxTest,
-        // transaction: request.transaction.actions[0].toJSON(),
         transaction: transactionFields.toJSON(),
-        // transaction: deserializedAction[0],
         signOptions: signTransactionOptions,
         // expireSeconds: (timeout)
     }
 
-    console.log("transaction: ", transactionData )
-
-    const transaction = await oreId.createTransaction(transactionData)
-
-    console.log(transaction.data)
+    const transaction: Transaction = await oreId.createTransaction(transactionData)
 
     const signParams: PopupPluginSignParams = {
         transaction,
     }
 
-    console.log('transaction_to_sign: ', transaction)
-
     const response_raw: PopupPluginSignResults = await oreId.popup.sign(signParams)
-    console.log('response_raw: ', response_raw)
-    // const url = new URL(urlString)
-    const mockData = new Bytes(new Uint8Array([0,1,0,1,1,0,1,]))
 
-    return({
+    return {
         // serializedTransaction: new Uint8Array([response_raw.signedTransaction]),
         // serializedTransaction: [ response_raw.signedTransaction ],
         // signatures: [ new Signature(KeyType.R1, new Bytes(new Uint8Array(response_raw.signatures))) ],
@@ -174,12 +146,12 @@ export async function popupTransact(
         // verified: true ,
         // whitelistedContracts: []
 
-            "signatures":[ new Signature(KeyType.R1, mockData)],
-            "type": 'transfer',
-            "verified": true,
-            whitelistedContracts: []
+        signatures: [new Signature(KeyType.R1, new Bytes(new Uint8Array(response_raw.signatures[0])))],
+        type: 'Transaction',
+        verified: true,
+        whitelistedContracts: []
 
-    })
+    }
 
     // const popup = await window.open(url, 'WalletPluginCloudWalletPopup', 'height=800,width=600')
     // if (!popup) {
