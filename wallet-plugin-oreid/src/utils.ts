@@ -1,4 +1,5 @@
-import {Action, Transaction} from '@wharfkit/session'
+import {Action, ChainDefinition, ChainName, Transaction} from '@wharfkit/session'
+import { ChainNetwork } from 'oreid-js'
 
 import {Buyrambytes, Transfer} from './types'
 
@@ -79,4 +80,33 @@ export function isValidEvent(event: MessageEvent, url: URL, window: Window): boo
         return false
     }
     return true
+}
+
+// Retrive the ORE ID Chain Name from Wharfkit Sessions chain definition
+export function getChainName(chain: ChainDefinition): ChainNetwork {
+    let oreIDChainName: ChainNetwork
+
+    switch (chain.name) {
+        case 'WAX (Testnet)':
+            oreIDChainName = ChainNetwork.WaxTest
+            break
+
+        case 'ORE (Testnet)':
+            oreIDChainName = ChainNetwork.OreTest
+            break
+
+        case 'EOS (Mainnet)':
+            oreIDChainName = ChainNetwork.EosMain
+            break
+
+        case 'EOS (Testnet)':
+            oreIDChainName = ChainNetwork.EosJungle
+            break
+
+        default:
+            oreIDChainName = ChainNetwork.OreMain
+            break
+    }
+
+    return oreIDChainName
 }

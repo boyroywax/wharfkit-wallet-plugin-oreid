@@ -510,17 +510,19 @@ export class WalletPluginOreId extends AbstractWalletPlugin implements WalletPlu
         // this.data.whitelist = response.whitelistedContracts
 
         return new Promise((resolve) => {
-            if (!context.chain) {
+            if (!context.chain && response === undefined) {
                 throw new Error('A chain must be selected to login with.')
             }
-            // Return to session's transact call
-            resolve({
-                chain: context.chain.id,
-                permissionLevel: PermissionLevel.from({
-                    actor: response.account,
-                    permission: 'active',
-                }),
-            })
+            else {
+                // Return to session's transact call
+                resolve({
+                    chain: context.chain?.id,
+                    permissionLevel: PermissionLevel.from({
+                        actor: response?.account,
+                        permission: 'active',
+                    }),
+                })
+            }
         })
     }
     /**

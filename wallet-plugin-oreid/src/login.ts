@@ -1,6 +1,6 @@
 import {Bytes, Name, PublicKeyType, UInt64, UserInterfaceTranslateOptions} from '@wharfkit/session'
 import {OreIdLoginResponse} from './types'
-import {isValidEvent, registerCloseListener} from './utils'
+import {getChainName, isValidEvent, registerCloseListener} from './utils'
 import { AuthProvider, LoginWithOreIdResult, OreId, PopupPluginAuthSuccessResults, UserPermissionForChainAccount } from 'oreid-js'
 
 export async function autoLogin(
@@ -68,28 +68,10 @@ export async function popupLogin(
 
     console.log("chain: ", chain)
 
-    let oreIDChainName: string
-
-    switch(chain.name) {
-        case('WAX (Testnet)'):
-            oreIDChainName = 'wax_test'
-            break
-
-        case('ORE (Testnet)'):
-            oreIDChainName = 'ore_test'
-            break
-
-        case('EOS (Mainnet)'):
-            oreIDChainName = 'eos_main'
-            break
-
-        default:
-            oreIDChainName = 'ore_main'
-            break
-    }
+    const oreIdChainName = getChainName(chain)
 
     const signingAccount = response_raw.user.chainAccounts.find(
-        (ca) => ca.chainNetwork === oreIDChainName
+        (ca) => ca.chainNetwork === oreIdChainName
     );
 
     const pubKeys: UserPermissionForChainAccount[] | undefined = signingAccount?.permissions
